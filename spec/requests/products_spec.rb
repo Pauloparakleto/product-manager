@@ -31,8 +31,12 @@ RSpec.describe '/products', type: :request do
   describe 'GET /show' do
     context 'with existent id' do
       let(:product) { Product.create! valid_attributes }
+      let(:related_product) { Product.create! attributes_for(:product)}
 
-      before { get product_url(product), as: :json }
+      before do
+        product.related_products << related_product
+        get product_url(product), as: :json
+      end
 
       it { expect(response).to have_http_status(:ok) }
 
@@ -44,7 +48,14 @@ RSpec.describe '/products', type: :request do
           price: product.price.as_json,
           quantity: product.quantity,
           created_at: product.created_at.as_json,
-          updated_at: product.updated_at.as_json
+          updated_at: product.updated_at.as_json,
+          related_products: [
+            {
+              id: related_product.id,
+              name: related_product.name,
+              price: related_product.price.as_json
+            }
+          ]
         )
       end
     end
