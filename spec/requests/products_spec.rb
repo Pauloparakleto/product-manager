@@ -7,7 +7,7 @@ RSpec.describe '/products', type: :request do
   describe 'GET /index' do
     let!(:product) { Product.create! valid_attributes }
 
-    before { get products_url, as: :json }
+    before { get products_url }
 
     it { expect(response).to have_http_status(:ok) }
 
@@ -50,7 +50,7 @@ RSpec.describe '/products', type: :request do
     end
 
     context 'with non-existent id' do
-      before { get product_url(22), as: :json }
+      before { get product_url(22) }
 
       it { expect(response).to have_http_status(404) }
 
@@ -58,6 +58,92 @@ RSpec.describe '/products', type: :request do
         json_data = JSON.parse(response.body, symbolize_names: true)
         expect(json_data).to eq(errors: ["Couldn't find Product with 'id'=22"])
       end
+    end
+  end
+
+  describe 'POST /products/:id/related_products/' do
+    context 'with a related product found' do
+      let(:main_product) { Product.create! valid_attributes }
+      let(:related_product) { Product.create! attributes_for(:product) }
+
+      before do
+        post related_products_product_path(main_product), params: {related_product_id: related_product.id}, as: :json
+      end
+      
+      it { expect(response).to have_http_status(201) }
+
+      it 'renders a JSON response with the related product' do
+        expect(response.body).to include_json(
+          id: related_product.id,
+          name: related_product.name,
+          price: related_product.price.as_json          
+        )
+      end
+    end
+
+    context 'when not found related product' do
+      let(:main_product) { Product.create! valid_attributes }
+      let(:related_product) { Product.create! attributes_for(:product) }
+
+      before do
+        post related_products_product_path(main_product), params: {related_product_id: 93}, as: :json
+      end
+
+      it { expect(response).to have_http_status(:not_found) }
+    end
+
+    context 'when not found main product' do
+      let(:related_product) { Product.create! attributes_for(:product) }
+
+      before do
+        post related_products_product_path(93), params: {related_product_id: related_product.id}, as: :json
+      end
+
+      it { expect(response).to have_http_status(:not_found) }
+    end
+
+    context 'when main product to itself' do
+      let(:main_product) { Product.create! valid_attributes }
+
+      before do
+        post related_products_product_path(main_product.reload), params: {related_product_id: main_product.id}, as: :json
+      end
+
+      it { expect(response).to have_http_status(:unprocessable_entity) }
+    end
+  end
+
+  describe 'DELETE /products/:id/related_products/' do
+    context 'with a related product found' do
+      let(:main_product) { Product.create! valid_attributes }
+      let(:related_product) { Product.create! attributes_for(:product) }
+
+      before do
+        main_product.related_products << related_product
+        delete related_products_product_path(main_product), params: {related_product_id: related_product.id}
+      end
+      
+      it { expect(response).to have_http_status(204) }
+    end
+
+    context 'when not found related product' do
+      let(:main_product) { Product.create! valid_attributes }
+
+      before do
+        delete related_products_product_path(main_product), params: {related_product_id: 93}
+      end
+
+      it { expect(response).to have_http_status(:not_found) }
+    end
+
+    context 'when not found main product' do
+      let(:related_product) { Product.create! attributes_for(:product) }
+
+      before do
+        delete related_products_product_path(93), params: {related_product_id: related_product.id}
+      end
+
+      it { expect(response).to have_http_status(:not_found) }
     end
   end
 
