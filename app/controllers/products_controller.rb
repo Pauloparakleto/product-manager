@@ -60,7 +60,8 @@ class ProductsController < ApplicationController
   private
 
   def set_page_params
-    params.fetch("page", 1).to_i - 1
+    page = params.fetch("page", 1).to_i - 1
+    page * set_minor_limit
   end
 
   def set_minor_limit
