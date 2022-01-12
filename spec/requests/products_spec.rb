@@ -6,25 +6,56 @@ RSpec.describe '/products', type: :request do
 
   describe 'GET /index' do
     let!(:product) { Product.create! valid_attributes }
+    let!(:second_product) { Product.create! attributes_for(:product) }
+    
+    context 'wihout pagination params' do
+      before { get products_url }
 
-    before { get products_url }
+      it { expect(response).to have_http_status(:ok) }
+  
+      it 'renders a JSON response with a list of products' do
+        expect(response.body).to include_json(
+          [
+            {
+              id: product.id,
+              name: product.name,
+              description: product.description,
+              price: product.price.as_json,
+              quantity: product.quantity,
+              created_at: product.created_at.as_json,
+              updated_at: product.updated_at.as_json
+            }
+          ]
+        )
+      end
+    end
 
-    it { expect(response).to have_http_status(:ok) }
+    context 'with pagination' do
+      before { get products_url, params: { page: 2, limit: 1} }
 
-    it 'renders a JSON response with a list of products' do
-      expect(response.body).to include_json(
-        [
-          {
-            id: product.id,
-            name: product.name,
-            description: product.description,
-            price: product.price.as_json,
-            quantity: product.quantity,
-            created_at: product.created_at.as_json,
-            updated_at: product.updated_at.as_json
-          }
-        ]
-      )
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'renders a JSON response with the second product' do
+        expect(response.body).to include_json(
+          [
+            {
+              id: second_product.id,
+              name: second_product.name,
+              description: second_product.description,
+              price: second_product.price.as_json,
+              quantity: second_product.quantity,
+              created_at: second_product.created_at.as_json,
+              updated_at: second_product.updated_at.as_json
+            }
+          ]
+        )
+      end
+
+      it 'has a max limit of 100' do
+        expect(Product).to receive(:limit).with(100).and_call_original
+        
+        get products_url, params: { limit: 550 }
+      end
     end
   end
 
