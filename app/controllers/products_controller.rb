@@ -8,7 +8,7 @@ class ProductsController < ApplicationController
   end
 
   def index
-    @products = Product.all
+    @products = Product.limit(params_limit).offset(page_params)
   end
 
   def show; end
@@ -49,7 +49,27 @@ class ProductsController < ApplicationController
     @product.destroy
   end
 
+  def params_limit
+    set_minor_limit
+  end
+
+  def page_params
+    set_page_params
+  end
+
   private
+
+  def set_page_params
+    page = params.fetch("page", 1).to_i - 1
+    page * set_minor_limit
+  end
+
+  def set_minor_limit
+    [
+      params.fetch("limit", 20).to_i,
+      100
+    ].min
+  end
 
   def set_product
     @product = Product.find(params[:id])
