@@ -8,7 +8,7 @@ class ProductsController < ApplicationController
   end
 
   def index
-    @products = Product.limit(params_limit).offset(page_params)
+    @products = Product.limit(params_limit).offset(page_params).order(sort_by_param)
   end
 
   def show; end
@@ -55,6 +55,10 @@ class ProductsController < ApplicationController
 
   def page_params
     set_page_params
+  end
+
+  def sort_by_param
+    params.fetch("sort_by", "id").to_sym
   end
 
   private
