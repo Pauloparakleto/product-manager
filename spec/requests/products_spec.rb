@@ -1,13 +1,113 @@
 require 'rails_helper'
 
+def second_first_product_json_to_match
+  [
+    {
+      id: second_product.id,
+      name: second_product.name,
+      description: second_product.description,
+      price: second_product.price.as_json,
+      quantity: second_product.quantity,
+      created_at: second_product.created_at.as_json,
+      updated_at: second_product.updated_at.as_json
+    },
+    {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price.as_json,
+      quantity: product.quantity,
+      created_at: product.created_at.as_json,
+      updated_at: product.updated_at.as_json
+    }
+  ]
+end
+
 RSpec.describe '/products', type: :request do
-  let(:valid_attributes) { attributes_for(:product) }
+  let(:valid_attributes) { attributes_for(:product, name: "Be the best product", price: 2.34) }
   let(:invalid_attributes) { valid_attributes.merge(price: nil) }
 
   describe 'GET /index' do
     let!(:product) { Product.create! valid_attributes }
-    let!(:second_product) { Product.create! attributes_for(:product) }
+    let!(:second_product) { Product.create! valid_attributes.merge(name: "A great product", price: 1.99) }
+    let!(:third_product) { Product.create! valid_attributes.merge(name: "Confort product", price: 3.97) }
+
+    context 'when sorting by name' do
+      before { get products_url, params: { sort_by: 'name'} }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'has second product on the first position' do
+        expect(response.body).to include_json(
+          second_first_product_json_to_match
+        )
+      end
+    end
     
+    context 'when sorting by price ascendent as default' do
+      before { get products_url, params: { sort_by: 'price'} }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'has second product on the first position' do
+        expect(response.body).to include_json(
+          second_first_product_json_to_match
+        )
+      end
+    end
+
+    context 'when sorting by price with explicitly ascendent sort_option' do
+      before { get products_url, params: { sort_by: 'price', sort_option: 'asc'} }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'has second product on the first position' do
+        expect(response.body).to include_json(
+         second_first_product_json_to_match
+        )
+      end
+    end
+
+    context 'when sorting by price with descendent sort_option' do
+      before { get products_url, params: { sort_by: 'price', sort_option: 'desc'} }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'has third product on the first position' do
+        expect(response.body).to include_json(
+          [
+            {
+              id: third_product.id,
+              name: third_product.name,
+              description: third_product.description,
+              price: third_product.price.as_json,
+              quantity: third_product.quantity,
+              created_at: third_product.created_at.as_json,
+              updated_at: third_product.updated_at.as_json
+            },
+            {
+              id: product.id,
+              name: product.name,
+              description: product.description,
+              price: product.price.as_json,
+              quantity: product.quantity,
+              created_at: product.created_at.as_json,
+              updated_at: product.updated_at.as_json
+            },
+            {
+              id: second_product.id,
+              name: second_product.name,
+              description: second_product.description,
+              price: second_product.price.as_json,
+              quantity: second_product.quantity,
+              created_at: second_product.created_at.as_json,
+              updated_at: second_product.updated_at.as_json
+            }
+          ]
+        )
+      end
+    end
+
     context 'wihout pagination params' do
       before { get products_url }
 
