@@ -1,7 +1,7 @@
 class ProductsController < ApplicationController
   before_action :set_product, only: %i[show update related_products remove_related destroy]
   before_action :set_related_product, only: [:related_products, :remove_related]
-  before_action :set_related_products, only: [:show]
+  before_action :set_related_product_list, only: [:show]
 
   rescue_from ActiveRecord::RecordNotFound do |error|
     render json: { errors: [error.message] }, status: :not_found
@@ -49,37 +49,13 @@ class ProductsController < ApplicationController
     @product.destroy
   end
 
-  def params_limit
-    set_minor_limit
-  end
-
-  def page_params
-    set_page_params
-  end
-
-  def sort_by_param
-    params.fetch("sort_by", "id").to_sym
-  end
-
   private
-
-  def set_page_params
-    page = params.fetch("page", 1).to_i - 1
-    page * set_minor_limit
-  end
-
-  def set_minor_limit
-    [
-      params.fetch("limit", 20).to_i,
-      100
-    ].min
-  end
 
   def set_product
     @product = Product.find(params[:id])
   end
 
-  def set_related_products
+  def set_related_product_list
     @related_products = @product.related_products
   end
 
