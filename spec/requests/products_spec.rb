@@ -56,8 +56,8 @@ RSpec.describe '/products', type: :request do
       end
     end
 
-    context 'when sorting by price with explicitly ascendent option' do
-      before { get products_url, params: { sort_by: 'price', option: 'asc'} }
+    context 'when sorting by price with explicitly ascendent sort_option' do
+      before { get products_url, params: { sort_by: 'price', sort_option: 'asc'} }
 
       it { expect(response).to have_http_status(:ok) }
 
@@ -68,8 +68,8 @@ RSpec.describe '/products', type: :request do
       end
     end
 
-    context 'when sorting by price with descendent option' do
-      before { get products_url, params: { sort_by: 'price', option: 'desc'} }
+    context 'when sorting by price with descendent sort_option' do
+      before { get products_url, params: { sort_by: 'price', sort_option: 'desc'} }
 
       it { expect(response).to have_http_status(:ok) }
 
