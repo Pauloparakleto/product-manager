@@ -1,0 +1,1 @@
+json.partial! 'related_product', related_product: @related_product

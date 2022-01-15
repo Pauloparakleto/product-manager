@@ -75,8 +75,12 @@ OBS:
 - Nas tarefas 2 e 3 pode ser usado uma gem para facilitar o trabalho
 - Já existem specs para o código atual, o candidato deverá adaptalas as mudanças solicitadas e adicionar novas quando necessário.
 
-### O que já está pronto:
-A api de produtos conforme a [documentação abaixo](#api-documentation)
+### Documentação detalhada da API
+Devido ao número elevado de exemplos de requisições, moveu-se a documentação para um local mais apropriado.
+
+Os detalhes para que o time do frontend possa implementar mais rapidamente algumas lógicas estão lá.
+
+- [Postman product manager workspace](https://www.postman.com/squada-mentoria/workspace/product-manager/overview)
 
 ## Rodando o projeto:
 
@@ -100,150 +104,10 @@ bundle install
 ```
 
 ```bash
-rails db:create db:migrate db:seed && RAILS_ENV=test rails db:migrate
+rails db:create db:migrate db:seed
 ```
 
 Rodando os testes:
 ```bash
 rspec -f doc
-```
-
-**OBS: Após finalizado o teste, o candidato deverá subir o projeto em seu github e nos enviar o link**
-
-## API Documentation
-- Product
-  - [list](#list-products)
-  - [get details](#get-product-details)
-  - [create](#create-a-product)
-  - [update](#update-a-product)
-  - [delete](#delete-a-product)
-
-### List Products
-```
-GET /products
-```
-
-```json
-// response body, status: 200
-[
-  {
-    "id": 1,
-    "name": "Product test",
-    "description": "Description of product test",
-    "price": "10.99",
-    "quantity": 50,
-    "created_at": "2021-07-05T23:13:17.383Z",
-    "created_at": "2021-07-05T23:13:17.383Z"
-  }
-]
-```
-
-### Get Product details
-```
-GET /products/:id
-```
-
-```json
-// response body, status: 200
-{
-  "id": 1,
-  "name": "Product test",
-  "description": "Description of product test",
-  "price": "10.99",
-  "quantity": 50,
-  "created_at": "2021-07-05T23:13:17.383Z",
-  "created_at": "2021-07-05T23:13:17.383Z"
-}
-```
-
-```json
-// response body, status: 404
-{
-  "errors": ["Couldn't find Product with 'id'=22"]
-}
-```
-
-### Create a Product
-```
-POST /products
-```
-
-```json
-// request body
-{
-  "name": "Product test",
-  "description": "Description of product test",
-  "price": "10.99",
-  "quantity": 50,
-}
-```
-
-```json
-// response body, status: 201
-{
-  "id": 1,
-  "name": "Product test",
-  "description": "Description of product test",
-  "price": "10.99",
-  "quantity": 50,
-  "created_at": "2021-07-05T23:13:17.383Z",
-  "created_at": "2021-07-05T23:13:17.383Z"
-}
-```
-
-```json
-// response body, status: 422
-{
-  "errors": ["Name has already been taken"]
-}
-```
-
-### Update a Product
-```
-PUT/PATCH /products
-```
-
-```json
-// request body
-{
-  "description": "NEW Description of product test",
-}
-```
-
-```json
-// response body, status: 201
-{
-  "id": 1,
-  "name": "Product test",
-  "description": "NEW Description of product test",
-  "price": "10.99",
-  "quantity": 50,
-  "created_at": "2021-07-05T23:13:17.383Z",
-  "created_at": "2021-07-05T23:13:17.383Z"
-}
-```
-
-```json
-// response body, status: 422
-{
-  "errors": ["Description can't be blank"]
-}
-```
-
-### Delete a Product
-
-```
-DELETE /products/:id
-```
-
-```json
-// response body, status: 204
-null
-```
-
-```json
-// response body, status: 404
-{
-  "errors": ["Couldn't find Product with 'id'=22"]
-}
 ```

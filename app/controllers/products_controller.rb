@@ -1,12 +1,15 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[show update destroy]
+  before_action :set_product, only: %i[show update related_products remove_related destroy]
+  before_action :set_related_product, only: [:related_products, :remove_related]
+  before_action :set_related_product_list, only: [:show]
 
   rescue_from ActiveRecord::RecordNotFound do |error|
     render json: { errors: [error.message] }, status: :not_found
   end
 
   def index
-    @products = Product.all
+    @query = Product.limit(params_limit).ransack(params[:search_by])
+    @products = @query.result.offset(page_params).order(sort_by_param)
   end
 
   def show; end
@@ -29,6 +32,20 @@ class ProductsController < ApplicationController
     end
   end
 
+  def related_products
+    @product.related_products << @related_product
+    if @related_product.valid?
+      render :related_product, status: :created, location: @related_product
+    else
+      render json: { errors: @related_product.errors.full_messages }, status: :unprocessable_entity
+    end 
+  end
+
+  def remove_related
+    @product.related_products.delete(@related_product)
+    render json: nil, status: :no_content
+  end
+
   def destroy
     @product.destroy
   end
@@ -37,6 +54,14 @@ class ProductsController < ApplicationController
 
   def set_product
     @product = Product.find(params[:id])
+  end
+
+  def set_related_product_list
+    @related_products = @product.related_products
+  end
+
+  def set_related_product
+    @related_product = Product.find(params[:related_product_id])
   end
 
   def product_params
