@@ -32,6 +32,37 @@ RSpec.describe '/products', type: :request do
     let!(:second_product) { Product.create! valid_attributes.merge(name: "A great product", price: 1.99) }
     let!(:third_product) { Product.create! valid_attributes.merge(name: "Confort product", price: 3.97) }
 
+    context "when search" do
+      before { get products_url, params: { search_by: { "price_lt": 3 } } }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'has second and first product' do
+        expect(response.body).to include_json(
+          [
+    {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price.as_json,
+      quantity: product.quantity,
+      created_at: product.created_at.as_json,
+      updated_at: product.updated_at.as_json
+    },
+    {
+      id: second_product.id,
+      name: second_product.name,
+      description: second_product.description,
+      price: second_product.price.as_json,
+      quantity: second_product.quantity,
+      created_at: second_product.created_at.as_json,
+      updated_at: second_product.updated_at.as_json
+    }
+  ]
+        )
+      end
+    end
+
     context 'when sorting by name' do
       before { get products_url, params: { sort_by: 'name'} }
 
@@ -149,12 +180,6 @@ RSpec.describe '/products', type: :request do
             }
           ]
         )
-      end
-
-      it 'has a max limit of 100' do
-        expect(Product).to receive(:limit).with(100).and_call_original
-        
-        get products_url, params: { limit: 550 }
       end
     end
   end
@@ -282,7 +307,7 @@ RSpec.describe '/products', type: :request do
       let(:related_product) { Product.create! attributes_for(:product) }
 
       before do
-        delete related_products_product_path(93), params: {related_product_id: related_product.id}
+        delete related_products_product_path(2000), params: {related_product_id: related_product.id}
       end
 
       it { expect(response).to have_http_status(:not_found) }

@@ -8,7 +8,8 @@ class ProductsController < ApplicationController
   end
 
   def index
-    @products = Product.limit(params_limit).offset(page_params).order(sort_by_param)
+    @query = Product.limit(params_limit).ransack(params[:search_by])
+    @products = @query.result.offset(page_params).order(sort_by_param)
   end
 
   def show; end
