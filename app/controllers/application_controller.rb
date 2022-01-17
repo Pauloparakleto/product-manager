@@ -17,7 +17,7 @@ class ApplicationController < ActionController::API
     end
 
     def set_header_with_pagination
-        return response.set_header("Count-Pages-Total", 1) if count_queries <= params_limit
+        return response.set_header("Count-Pages-Total", 1) if single_page?
     
         count_pages = (count_queries / params_limit)
         remaining_page = count_pages%params_limit
@@ -26,6 +26,10 @@ class ApplicationController < ActionController::API
       end
 
     private
+
+    def single_page?
+        count_queries <= params_limit
+    end
 
     def count_queries
         @query.result.count
