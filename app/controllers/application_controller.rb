@@ -16,7 +16,20 @@ class ApplicationController < ActionController::API
         set_minor_limit
     end
 
+    def set_header_with_pagination
+        return response.set_header("Count-Pages-Total", 1) if count_queries <= params_limit
+    
+        count_pages = (count_queries / params_limit)
+        remaining_page = count_pages%params_limit
+        count_pages += 1 unless remaining_page.zero?
+        response.set_header("Count-Pages-Total", count_pages)
+      end
+
     private
+
+    def count_queries
+        @query.result.count
+    end
 
     def set_sort_by_params
         sort_by_column_name = params.fetch("sort_by", "id")
