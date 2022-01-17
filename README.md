@@ -76,6 +76,8 @@ OBS:
 - Já existem specs para o código atual, o candidato deverá adaptalas as mudanças solicitadas e adicionar novas quando necessário.
 
 ### Documentação detalhada da API
+![Jay-Gatsby-Leonardo-DiCaprio](https://user-images.githubusercontent.com/52010485/149684975-44e19c16-5254-4fff-bf01-f788ac95e20f.jpg)
+
 Devido ao número elevado de exemplos de requisições, moveu-se a documentação para um local mais apropriado.
 
 Os detalhes para que o time do frontend possa implementar mais rapidamente algumas lógicas estão lá.
