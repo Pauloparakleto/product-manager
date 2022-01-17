@@ -2,14 +2,15 @@ class ProductsController < ApplicationController
   before_action :set_product, only: %i[show update related_products remove_related destroy]
   before_action :set_related_product, only: [:related_products, :remove_related]
   before_action :set_related_product_list, only: [:show]
+  after_action :set_header_with_pagination, only: [:index]
 
   rescue_from ActiveRecord::RecordNotFound do |error|
     render json: { errors: [error.message] }, status: :not_found
   end
 
   def index
-    @query = Product.limit(params_limit).ransack(params[:search_by])
-    @products = @query.result.offset(page_params).order(sort_by_param)
+    @query = Product.ransack(params[:search_by])
+    @products = @query.result.limit(params_limit).offset(page_params).order(sort_by_param)
   end
 
   def show; end
