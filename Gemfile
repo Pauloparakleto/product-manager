@@ -3,7 +3,9 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.0.1'
 
+gem 'faker', :git => 'https://github.com/faker-ruby/faker.git', :branch => 'master'
 gem 'rails', '~> 6.1.4'
+gem 'rack-cors'
 gem 'ransack'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.0'
@@ -21,7 +23,6 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'factory_bot_rails'
   gem 'pry-rails'
-  gem 'faker', :git => 'https://github.com/faker-ruby/faker.git', :branch => 'master'
 end
 
 group :development do
