@@ -6,7 +6,7 @@ Rails.application.configure do
   # Code is not reloaded between requests.
   config.cache_classes = true
 
-  config.hosts << 'https://product-manager-react-darkside.herokuapp.com/'
+  config.hosts << "product-manager-backend-side.herokuapp.com"
 
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
